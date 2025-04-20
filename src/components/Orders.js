@@ -1,29 +1,65 @@
 import React, { useState, useEffect } from "react";
-import { sampleOrders } from "./data/sampleData";
 import "../styles/theme.css";
+import { useOrders } from "../contexts/OrdersProvider";
 
+/**
+ * Orders Component
+ * 
+ * Displays orders for the current user in a table format
+ * Features:
+ * - Shows order details including ID, price, product, quantity, status, and user ID
+ * - Automatically updates when orders change
+ * - Refreshes when tab becomes visible
+ * - Color-coded status indicators
+ * - Cross-tab synchronization
+ */
 function Orders() {
-  const [orders, setOrders] = useState([]);
-  const useSampleData = true; // Set to false to use API, true to use sample data
-
+  const { getUserOrders } = useOrders();
+  const [userOrders, setUserOrders] = useState([]);
+  
+  // Update orders whenever component renders or tab is focused
   useEffect(() => {
-    // Original API call
-    // const userId = localStorage.getItem("userId");
-    // api.get(`/order/user/${userId}`)
-    //   .then(res => setOrders(res.data))
-    //   .catch(err => console.error(err));
+    /**
+     * Update the orders state with the latest orders from context
+     */
+    const updateOrders = () => {
+      setUserOrders(getUserOrders());
+    };
+    
+    // Update on mount
+    updateOrders();
+    
+    /**
+     * Handle tab visibility changes
+     * Updates orders when tab becomes visible again
+     */
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        updateOrders();
+      }
+    };
+    
+    // Add visibility change listener
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    // Regular polling for updates (as a fallback)
+    const intervalId = setInterval(updateOrders, 3000);
+    
+    // Clean up event listeners and interval on unmount
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      clearInterval(intervalId);
+    };
+  }, [getUserOrders]);
 
-    // Sample data for testing
-    if (useSampleData) {
-      const userId = localStorage.getItem("userId") || "U001"; // Default to "U001" for testing
-      const filteredOrders = sampleOrders.filter(order => order.userId === userId);
-      setOrders(filteredOrders);
-    }
-  }, [useSampleData]);
-
-  // helper function to assign styles based on status
+  /**
+   * Get the appropriate CSS classes for status styling
+   * 
+   * @param {string} status - The order status
+   * @returns {string} CSS classes for the status badge
+   */
   const getStatusStyle = (status) => {
-    switch (status.toLowerCase()) {
+    switch (status?.toLowerCase()) {
       case "new":
         return "bg-blue-100 text-blue-700";
       case "inprogress":
@@ -39,36 +75,48 @@ function Orders() {
 
   return (
     <div className="min-h-screen bg-[var(--background-color)] p-6">
-      <h2 className="text-2xl font-bold text-[var(--text-color)] text-center mb-6">My Orders</h2>
-      
+      <h2 className="text-2xl font-bold text-[var(--text-color)] text-center mb-6">
+        My Orders
+      </h2>
       <div className="overflow-x-auto">
         <table className="w-full border-collapse bg-[var(--card-background)] shadow-md rounded-lg">
           <thead>
             <tr className="bg-[var(--primary-color)]">
-              <th className="p-3 text-[var(--text-secondary)]">ORDER_ID</th>
+              <th className="p-3 text-[var(--text-secondary)]">ORDER ID</th>
               <th className="p-3 text-[var(--text-secondary)]">PRICE</th>
-              <th className="p-3 text-[var(--text-secondary)]">PRODUCT_ID</th>
+              <th className="p-3 text-[var(--text-secondary)]">PRODUCT ID</th>
               <th className="p-3 text-[var(--text-secondary)]">QUANTITY</th>
               <th className="p-3 text-[var(--text-secondary)]">STATUS</th>
-              <th className="p-3 text-[var(--text-secondary)]">USER_ID</th>
+              <th className="p-3 text-[var(--text-secondary)]">USER ID</th>
             </tr>
           </thead>
           <tbody>
-            {orders.map(order => (
-              <tr key={order.orderId} className="border-b hover:bg-gray-100">
-                <td className="p-3 text-[var(--text-color)]">{order.orderId}</td>
-                <td className="p-3 text-[var(--text-color)]">₹{order.price}</td>
-                <td className="p-3 text-[var(--text-color)]">{order.productId}</td>
-                <td className="p-3 text-[var(--text-color)]">{order.quantity}</td>
-                <td className="p-3">
-                  <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getStatusStyle(order.status)}`}>
-                    {order.status}
-                  </span>
+            {userOrders.length > 0 ? (
+              userOrders.map((order) => (
+                <tr key={order.orderId} className="border-b hover:bg-gray-100">
+                  <td className="p-3 text-[var(--text-color)]">{order.orderId}</td>
+                  <td className="p-3 text-[var(--text-color)]">₹{order.price}</td>
+                  <td className="p-3 text-[var(--text-color)]">{order.productId}</td>
+                  <td className="p-3 text-[var(--text-color)]">{order.quantity}</td>
+                  <td className="p-3">
+                    <span
+                      className={`px-3 py-1 rounded-full text-sm font-semibold ${getStatusStyle(
+                        order.status
+                      )}`}
+                    >
+                      {order.status}
+                    </span>
+                  </td>
+                  <td className="p-3 text-[var(--text-color)]">{order.userId}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="6" className="p-4 text-center text-[var(--text-color)]">
+                  No orders found
                 </td>
-
-                <td className="p-3 text-[var(--text-color)]">{order.userId}</td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>

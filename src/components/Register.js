@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import '../index.css';
 
 function Register() {
   const [formData, setFormData] = useState({
-    firstName: "", lastName: "", email: "", mobileNumber: "", address: "",
-    paymentType: "Credit Card", paymentId: "", password: "", validityYear: ""
+    firstName: "", lastName: "", email: "",password: "", mobileNumber: "", address: "",
+    paymentType: "Credit Card", paymentId: "", securitypassword: "", validityYear: ""
   });
+  const navigate = useNavigate();
+
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -24,6 +27,7 @@ function Register() {
       .then(response => {
         alert("User registered successfully!");
         console.log(response.data);
+        navigate("/home");
       })
       .catch(error => {
         alert("Registration failed!");
@@ -42,27 +46,26 @@ function Register() {
             <div className="flex-1">
               <div className="mb-4">
                 <label className="block text-sm font-medium mb-1 text-[var(--text-color)]">Personal Information</label>
-                <input
-                  type="text"
-                  name="firstName"
-                  placeholder="First Name"
-                  value={formData.firstName}
-                  onChange={handleChange}
-                  className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)]"
-                  required
-                />
-              </div>
-              
-              <div className="mb-4">
-                <input
-                  type="text"
-                  name="lastName"
-                  placeholder="Last Name"
-                  value={formData.lastName}
-                  onChange={handleChange}
-                  className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)]"
-                  required
-                />
+                <div className="flex gap-4">
+                  <input
+                    type="text"
+                    name="firstName"
+                    placeholder="First Name"
+                    value={formData.firstName}
+                    onChange={handleChange}
+                    className="w-1/2 p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)]"
+                    required
+                  />
+                  <input
+                    type="text"
+                    name="lastName"
+                    placeholder="Last Name"
+                    value={formData.lastName}
+                    onChange={handleChange}
+                    className="w-1/2 p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)]"
+                    required
+                  />
+                </div>
               </div>
               
               <div className="mb-4">
@@ -71,6 +74,18 @@ function Register() {
                   name="email"
                   placeholder="Email"
                   value={formData.email}
+                  onChange={handleChange}
+                  className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)]"
+                  required
+                />
+              </div>
+
+              <div className="mb-4">
+                <input
+                  type="password"
+                  name="password"
+                  placeholder="Password"
+                  value={formData.password}
                   onChange={handleChange}
                   className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)]"
                   required
@@ -149,9 +164,9 @@ function Register() {
                 <label className="block text-sm font-medium mb-1 text-[var(--text-color)]">Security</label>
                 <input
                   type="password"
-                  name="password"
-                  placeholder="Password"
-                  value={formData.password}
+                  name="securitypassword"
+                  placeholder="Security Password"
+                  value={formData.securitypassword}
                   onChange={handleChange}
                   className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)]"
                   required
