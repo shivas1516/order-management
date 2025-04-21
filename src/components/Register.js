@@ -1,16 +1,25 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import '../index.css';
 
 function Register() {
   const [formData, setFormData] = useState({
-    firstName: "", lastName: "", email: "", mobileNumber: "", address: "",
-    paymentType: "Credit Card", paymentId: "", password: "", validityYear: ""
+    firstName: "", lastName: "", email: "",password: "", mobileNumber: "", address: "",
+    paymentType: "Credit Card", paymentId: "", securitypassword: "", validityYear: ""
   });
+  const navigate = useNavigate();
+
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+
+  useEffect(() => {
+    if (formData.paymentType === "UPI") {
+      setFormData(prev => ({ ...prev, validityYear: "" }));
+    }
+  }, [formData.paymentType]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -18,6 +27,7 @@ function Register() {
       .then(response => {
         alert("User registered successfully!");
         console.log(response.data);
+        navigate("/home");
       })
       .catch(error => {
         alert("Registration failed!");
@@ -26,99 +36,153 @@ function Register() {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen">
-      <div className="bg-[var(--card-background)] p-8 rounded-lg shadow-lg w-full max-w-md">
+    <div className="flex justify-center items-center min-h-screen p-4">
+      <div className="bg-[var(--card-background)] p-8 rounded-lg shadow-lg w-full max-w-4xl">
         <h2 className="text-2xl font-bold text-center mb-6 text-[var(--text-color)]">User Registration</h2>
+        
         <form onSubmit={handleSubmit}>
-          <input
-            type="text"
-            name="firstName"
-            placeholder="First Name"
-            value={formData.firstName}
-            onChange={handleChange}
-            className="w-full p-3 mb-4 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)]"
-            required
-          />
-          <input
-            type="text"
-            name="lastName"
-            placeholder="Last Name"
-            value={formData.lastName}
-            onChange={handleChange}
-            className="w-full p-3 mb-4 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)]"
-            required
-          />
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={formData.email}
-            onChange={handleChange}
-            className="w-full p-3 mb-4 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)]"
-            required
-          />
-          <input
-            type="text"
-            name="mobileNumber"
-            placeholder="Mobile Number"
-            value={formData.mobileNumber}
-            onChange={handleChange}
-            className="w-full p-3 mb-4 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)]"
-            required
-          />
-          <input
-            type="text"
-            name="address"
-            placeholder="Address"
-            value={formData.address}
-            onChange={handleChange}
-            className="w-full p-3 mb-4 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)]"
-            required
-          />
-          <select
-            name="paymentType"
-            value={formData.paymentType}
-            onChange={handleChange}
-            className="w-full p-3 mb-4 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)]"
-            required
-          >
-            <option value="Credit Card">Credit Card</option>
-            <option value="Debit Card">Debit Card</option>
-            <option value="UPI">UPI</option>
-          </select>
-          <input
-            type="text"
-            name="paymentId"
-            placeholder="Payment ID"
-            value={formData.paymentId}
-            onChange={handleChange}
-            className="w-full p-3 mb-4 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)]"
-            required
-          />
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
-            className="w-full p-3 mb-4 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)]"
-            required
-          />
-          <input
-            type="number"
-            name="validityYear"
-            placeholder="Validity Year"
-            value={formData.validityYear}
-            onChange={handleChange}
-            className="w-full p-3 mb-4 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)]"
-            required
-          />
-          <button
-            type="submit"
-            className="w-full p-3 bg-[var(--primary-color)] text-white rounded-md hover:bg-[var(--primary-hover)] transition"
-          >
-            Register
-          </button>
+          <div className="flex flex-col md:flex-row gap-6">
+            {/* Left Column */}
+            <div className="flex-1">
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1 text-[var(--text-color)]">Personal Information</label>
+                <div className="flex gap-4">
+                  <input
+                    type="text"
+                    name="firstName"
+                    placeholder="First Name"
+                    value={formData.firstName}
+                    onChange={handleChange}
+                    className="w-1/2 p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)]"
+                    required
+                  />
+                  <input
+                    type="text"
+                    name="lastName"
+                    placeholder="Last Name"
+                    value={formData.lastName}
+                    onChange={handleChange}
+                    className="w-1/2 p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)]"
+                    required
+                  />
+                </div>
+              </div>
+              
+              <div className="mb-4">
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)]"
+                  required
+                />
+              </div>
+
+              <div className="mb-4">
+                <input
+                  type="password"
+                  name="password"
+                  placeholder="Password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)]"
+                  required
+                />
+              </div>
+              
+              <div className="mb-4">
+                <input
+                  type="text"
+                  name="mobileNumber"
+                  placeholder="Mobile Number"
+                  value={formData.mobileNumber}
+                  onChange={handleChange}
+                  className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)]"
+                  required
+                />
+              </div>
+              
+              <div className="mb-4">
+                <input
+                  type="text"
+                  name="address"
+                  placeholder="Address"
+                  value={formData.address}
+                  onChange={handleChange}
+                  className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)]"
+                  required
+                />
+              </div>
+            </div>
+            
+            {/* Right Column */}
+            <div className="flex-1">
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1 text-[var(--text-color)]">Payment Details</label>
+                <select
+                  name="paymentType"
+                  value={formData.paymentType}
+                  onChange={handleChange}
+                  className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)]"
+                  required
+                >
+                  <option value="Credit Card">Credit Card</option>
+                  <option value="Debit Card">Debit Card</option>
+                  <option value="UPI">UPI</option>
+                </select>
+              </div>
+              
+              <div className="mb-4">
+                <input
+                  type="text"
+                  name="paymentId"
+                  placeholder={formData.paymentType === "UPI" ? "UPI ID" : "Payment ID"}
+                  value={formData.paymentId}
+                  onChange={handleChange}
+                  className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)]"
+                  required
+                />
+              </div>
+              
+              {formData.paymentType !== "UPI" && (
+                <div className="mb-4">
+                  <input
+                    type="number"
+                    name="validityYear"
+                    placeholder="Validity Year"
+                    value={formData.validityYear}
+                    onChange={handleChange}
+                    className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)]"
+                    required={formData.paymentType !== "UPI"}
+                  />
+                </div>
+              )}
+              
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1 text-[var(--text-color)]">Security</label>
+                <input
+                  type="password"
+                  name="securitypassword"
+                  placeholder="Security Password"
+                  value={formData.securitypassword}
+                  onChange={handleChange}
+                  className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)]"
+                  required
+                />
+              </div>
+            </div>
+          </div>
+          
+          <div className="mt-6">
+            <button
+              type="submit"
+              className="w-full p-3 bg-[var(--primary-color)] text-white rounded-md hover:bg-[var(--primary-hover)] transition"
+            >
+              Register
+            </button>
+          </div>
         </form>
       </div>
     </div>
